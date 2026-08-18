@@ -5883,6 +5883,11 @@ EOF
   [ -x /usr/bin/sb ] && [ -x /usr/bin/nb ] && info "\n $(text 71) "
 }
 
+# 兼容已用旧版安装的机器：旧版只有 sb，运行新版脚本时自动补建 nb。
+ensure_nadev_shortcut() {
+  [ -x "${WORK_DIR}/sb.sh" ] && ln -sf "${WORK_DIR}/sb.sh" /usr/bin/nb
+}
+
 # 增加或删除协议
 change_protocols() {
   check_install
@@ -6785,12 +6790,14 @@ if [ "${IS_NADEV_DOCTOR}" = true ]; then
   # Doctor 不执行 check_dependencies，确保不会因为诊断而安装软件包或改动服务。
   check_system_ip
   check_install
+  ensure_nadev_shortcut
   nadev_doctor
   exit 0
 fi
 check_dependencies
 check_system_ip
 check_install
+ensure_nadev_shortcut
 if [ "$NONINTERACTIVE_INSTALL" = 'noninteractive_install' ]; then
   # 预设默认值，允许只传 --CHOOSE_PROTOCOLS 进行最小无交互安装。
   CHOOSE_PROTOCOLS=${CHOOSE_PROTOCOLS:-'a'}
