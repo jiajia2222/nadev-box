@@ -6,6 +6,7 @@ VERSION='v1.3.23 (2026.08.17)'
 # Nadev Box 是基于 fscarmen/sing-box 的 GPL-3.0-or-later 定制发行版。
 # 保留上游实现与署名；此地址用于本分支的安装、快捷命令和更新检查。
 NADEV_BOX_RAW_BASE='https://raw.githubusercontent.com/jiajia2222/nadev-box/main'
+NADEV_BBR_RAW='https://raw.githubusercontent.com/byJoey/Actions-bbr-v3/main/install.sh'
 
 # Github 反代加速代理
 GITHUB_PROXY=('https://hub.glowp.xyz/' 'https://proxy.vvvv.ee/')
@@ -35,6 +36,16 @@ export DEBIAN_FRONTEND=noninteractive
 
 cleanup_temp() {
   rm -rf "$TEMP_DIR"
+}
+
+# Nadev 的 BBR 入口：byJoey 负责内核、队列算法和系统兼容性判断。
+run_nadev_bbr() {
+  if [ "$L" = 'C' ]; then
+    hint "\n 正在打开 byJoey BBRv3 内核与网络优化管理器...\n"
+  else
+    hint "\n Opening the byJoey BBRv3 kernel and network tuning manager...\n"
+  fi
+  bash <(wget --no-check-certificate -qO- "${GH_PROXY}${NADEV_BBR_RAW}")
 }
 
 trap cleanup_temp EXIT
@@ -106,8 +117,8 @@ E[30]="Listen ports  (current: \${VAL_ITEM})"
 C[30]="监听端口  (当前: \${VAL_ITEM})"
 E[31]="Sync Sing-box to the latest version (nb -v)"
 C[31]="同步 Sing-box 至最新版本 (nb -v)"
-E[32]="Upgrade kernel, turn on BBR, change Linux system (nb -b)"
-C[32]="升级内核、安装BBR、DD脚本 (nb -b)"
+E[32]="Open byJoey BBRv3 kernel manager (nb -b)"
+C[32]="运行 byJoey BBRv3 内核管理器 (nb -b)"
 E[33]="Uninstall (nb -u)"
 C[33]="卸载 (nb -u)"
 E[34]="Install Sing-box"
@@ -6480,7 +6491,7 @@ menu_setting() {
     ACTION[4]() { change_argo; exit; }
     ACTION[5]() { change_config; exit; }
     ACTION[6]() { version; exit; }
-    ACTION[7]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh); exit; }
+    ACTION[7]() { run_nadev_bbr; exit; }
     ACTION[8]() { change_protocols; exit; }
     ACTION[9]() { uninstall; exit; }
     ACTION[10]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://raw.githubusercontent.com/fscarmen/argox/main/argox.sh) -$L; exit; }
@@ -6504,7 +6515,7 @@ menu_setting() {
     ACTION[3]() { IS_SUB=no_sub; IS_ARGO=is_argo; install_sing-box; export_list install; create_shortcut; exit; }
     ACTION[4]() { IS_SUB=is_sub; IS_ARGO=no_argo; install_sing-box; export_list install; create_shortcut; exit; }
     ACTION[5]() { install_sing-box; export_list install; create_shortcut; exit; }
-    ACTION[6]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh); exit; }
+    ACTION[6]() { run_nadev_bbr; exit; }
     ACTION[7]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://raw.githubusercontent.com/fscarmen/argox/main/argox.sh) -$L; exit; }
     ACTION[8]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://raw.githubusercontent.com/fscarmen/sba/main/sba.sh) -$L; exit; }
     ACTION[9]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://tcp.hy2.sh/); exit; }
@@ -6737,7 +6748,7 @@ for z in ${!ALL_PARAMETER[@]}; do
       check_system_info; check_arch; version; exit 0
       ;;
     -B )
-      bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh); exit
+      run_nadev_bbr; exit
       ;;
     -R )
       change_protocols; exit 0

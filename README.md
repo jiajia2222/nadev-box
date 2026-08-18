@@ -24,7 +24,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/in
 | --- | --- |
 | 常规公网 VPS | XTLS Reality、Hysteria2、TUIC、Shadowsocks、Trojan 等多协议按需安装 |
 | NAT / CGNAT / 无公网入口 | Hysteria2 Realm，可选 WARP 辅助打洞 |
-| 网络优化 | Hysteria2 端口跳跃、独立端口、DDNS 服务器地址、TCP BBR 工具入口 |
+| 网络优化 | Hysteria2 端口跳跃、独立端口、DDNS 服务器地址，以及 byJoey BBRv3 内核 / TCP 优化入口 |
 | 客户端使用 | 自动生成 V2rayN、Clash/Mihomo、Shadowrocket、Throne 与 sing-box 配置/订阅 |
 | 日常维护 | 主菜单查看运行状态；`nb -d` 修改节点名、端口、服务器地址、Reality SNI 与订阅配置 |
 
@@ -249,7 +249,7 @@ nb
   | -s              | Stop / Start the Sing-box service 停止/开启 Sing-box 服务 |
   | -a              | Stop / Start the Argo Tunnel service 停止/开启 Argo Tunnel 服务 |
   | -v              | Sync Argo Xray to the newest 同步 Argo Xray 到最新版本 |
-  | -b              | Upgrade kernel, turn on BBR, change Linux system 升级内核、安装BBR、DD脚本 |
+| -b              | Open byJoey BBRv3 kernel manager / 运行 byJoey BBRv3 内核管理器 |
   | -r              | Add and remove protocols 添加和删除协议 |
 
 
