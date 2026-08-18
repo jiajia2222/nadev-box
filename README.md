@@ -534,15 +534,17 @@ bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/in
 ### 说明:
 * 支持三种 Argo 类型隧道: 临时 (不需要域名) / Json / Token
 * 需要20个连续可用的端口，以 `START_PORT` 开始第一个
+* Nadev Box 默认采用本仓库本地构建镜像，不依赖未声明的第三方 Docker Hub 镜像名称
 
 <details>
     <summary> Docker 部署（点击即可展开或收起）</summary>
 <br>
 
 ```
+docker build -t nadev-box:latest .
+
 docker run -dit \
-    --pull always \
-    --name sing-box \
+    --name nadev-box \
     --network host \
     -e START_PORT=8800 \
     -e SERVER_IP=123.123.123.123 \
@@ -559,11 +561,11 @@ docker run -dit \
     -e ANYTLS=true \
     -e UUID=20f7fca4-86e5-4ddf-9eed-24142073d197 \
     -e CDN=www.csgo.com \
-    -e NODE_NAME=sing-box \
+    -e NODE_NAME=Nadev-my-vps \
     -e ARGO_DOMAIN=sb.argo.com \
     -e ARGO_AUTH='{"AccountTag":"9cc9e3e4d8f29d2a02e297f14f20513a","TunnelSecret":"6AYfKBOoNlPiTAuWg64ZwujsNuERpWLm6pPJ2qpN8PM=","TunnelID":"1ac55430-f4dc-47d5-a850-bdce824c4101"}' \
     -e REALITY_PRIVATE=UPO3FWlg6YDJbASYi7KIESibPec_K46edTvDPbqEYFk \
-    fscarmen/sb
+    nadev-box:latest
 ```
 </details>
 
@@ -573,13 +575,13 @@ docker run -dit \
 
 ```
 networks:
-    sing-box:
-        name: sing-box
+    nadev-box:
+        name: nadev-box
 services:
-    sing-box:
-        image: fscarmen/sb
-        pull_policy: always
-        container_name: sing-box
+    nadev-box:
+        build: .
+        image: nadev-box:latest
+        container_name: nadev-box
         restart: always
         network_mode: host
         environment:
@@ -609,13 +611,13 @@ services:
 ### 常用指令
 | 功能 | 指令 |
 | ---- | ---- |
-| 查看节点信息 | `docker exec -it sing-box cat list` |
-| 查看容器日志 | `docker logs -f sing-box` |
-| 更新 Sing-box 版本 | `docker exec -it sing-box bash init.sh -v` |
-| 查看容器内存,CPU，网络等资源使用情况 | `docker stats sing-box` |
-| 暂停容器 | docker: `docker stop sing-box`</br> compose: `docker-compose stop` |
-| 停止并删除容器 | docker: `docker rm -f sing-box`</br> compose: `docker-compose down` |
-| 删除镜像 | `docker rmi -f fscarmen/sb:latest` |
+| 查看节点信息 | `docker exec -it nadev-box cat list` |
+| 查看容器日志 | `docker logs -f nadev-box` |
+| 更新 Sing-box 版本 | `docker exec -it nadev-box bash init.sh -v` |
+| 查看容器内存、CPU、网络等资源使用情况 | `docker stats nadev-box` |
+| 暂停容器 | docker: `docker stop nadev-box`</br> compose: `docker compose stop` |
+| 停止并删除容器 | docker: `docker rm -f nadev-box`</br> compose: `docker compose down` |
+| 删除本地镜像 | `docker rmi nadev-box:latest` |
 
 ### 参数说明
 | 参数 | 是否必须 | 说明 |
@@ -637,7 +639,7 @@ services:
 | -e ANYTLS | 是 |          true 为启用 AnyTLS 协议，不需要的话删除本参数或填 false |
 | -e UUID | 否 | 不指定的话 UUID 将默认随机生成 |
 | -e CDN | 否 | 优选域名，不指定的话将使用 skk.moe |
-| -e NODE_NAME | 否 | 节点名称，不指定的话将使用 sing-box |
+| -e NODE_NAME | 否 | 节点名称；不指定时默认使用 `Nadev-主机名` |
 | -e ARGO_DOMAIN | 否 | Argo 固定隧道域名 , 与 ARGO_DOMAIN 一并使用才能生效 |
 | -e ARGO_AUTH | 否 | Argo 认证信息，可以是 Json， Token 或者 Cloudflare API，与 ARGO_DOMAIN 一并使用才能生效，不指定的话将使用临时隧道 |
 

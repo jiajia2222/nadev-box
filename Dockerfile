@@ -23,6 +23,11 @@ FROM alpine:latest
 ARG TARGETARCH
 ENV ARCH=$TARGETARCH
 
+LABEL org.opencontainers.image.title="Nadev Box" \
+      org.opencontainers.image.description="Nadev Box container image, based on fscarmen/sing-box" \
+      org.opencontainers.image.source="https://github.com/jiajia2222/nadev-box" \
+      org.opencontainers.image.licenses="GPL-3.0-or-later"
+
 # 设置工作目录
 WORKDIR /sing-box
 
@@ -31,6 +36,9 @@ COPY --from=builder / /
 
 # 复制初始化脚本
 COPY docker_init.sh /sing-box/init.sh
+
+# 将 GPL 第三方署名一并带入镜像，便于离线查看
+COPY NOTICE.md /usr/share/doc/nadev-box/NOTICE.md
 
 # 安装运行时依赖并生成证书
 RUN set -ex &&\

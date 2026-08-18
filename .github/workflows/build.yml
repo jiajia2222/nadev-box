@@ -1,4 +1,4 @@
-name: "Build and push images"
+name: "Build Nadev Box Docker image"
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
 jobs:
   Build:
       runs-on: ubuntu-latest
-      name: "Build Sing-box image"
+      name: "Build Nadev Box image"
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

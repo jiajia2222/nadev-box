@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
-# 脚本更新日期 2026.08.14
+# Nadev Box Docker 初始化器 · 基于 fscarmen/sing-box
 set -e
 
 WORK_DIR=/sing-box
 PORT=$START_PORT
 SUBSCRIBE_TEMPLATE="https://raw.githubusercontent.com/fscarmen/client_template/main"
+NADEV_BOX_RAW_BASE='https://raw.githubusercontent.com/jiajia2222/nadev-box/main'
 
 # 自定义字体彩色，read 函数
 warning() { echo -e "\033[31m\033[01m$*\033[0m"; }  # 红色
 info() { echo -e "\033[32m\033[01m$*\033[0m"; }     # 绿色
 hint() { echo -e "\033[33m\033[01m$*\033[0m"; }     # 黄色
+
+nadev_docker_banner() {
+  info "\n ╔═ N A D E V   B O X · Docker ═╗"
+  hint " ║ Smart node container · GPL-3.0 ║"
+  info " ╚═══════════════════════════════╝\n"
+}
 
 # 判断系统架构，以下载相应的应用
 case "$ARCH" in
@@ -27,7 +34,7 @@ esac
 # 检查 sing-box 最新版本
 check_latest_sing-box() {
   # 检查是否强制指定版本
-  local FORCE_VERSION=$(wget --no-check-certificate --tries=2 --timeout=3 -qO- https://raw.githubusercontent.com/jiajia2222/nadev-box/main/force_version | sed 's/^[vV]//g')
+  local FORCE_VERSION=$(wget --no-check-certificate --tries=2 --timeout=3 -qO- "${NADEV_BOX_RAW_BASE}/force_version" | sed 's/^[vV]//g')
 
   # 没有强制指定版本时，获取最新版本
   if grep -q '.' <<< "$FORCE_VERSION"; then
@@ -138,7 +145,7 @@ install() {
   local SIP022_PASSWORD=$(${WORK_DIR}/sing-box generate rand --base64 16)
   local SIP022_METHOD="2022-blake3-aes-128-gcm"
   local UUID=${UUID:-"$(${WORK_DIR}/sing-box generate uuid)"}
-  local NODE_NAME=${NODE_NAME:-"sing-box"}
+  local NODE_NAME=${NODE_NAME:-"Nadev-$(hostname)"}
   local CDN=${CDN:-"skk.moe"}
 
   # 检测是否解锁 chatGPT，首先检查API访问
@@ -1312,7 +1319,8 @@ $(${WORK_DIR}/qrencode "https://${ARGO_DOMAIN}/${UUID}/auto")
 EOF
 
   # 生成配置文件
-  EXPORT_LIST_FILE="*******************************************
+  EXPORT_LIST_FILE="Nadev Box · Docker deployment
+*******************************************
 ┌────────────────┐
 │                │
 │     $(warning "V2rayN")     │
@@ -1405,7 +1413,7 @@ $(${WORK_DIR}/qrencode https://${ARGO_DOMAIN}/${UUID}/auto)
 
   # 显示脚本使用情况数据
   hint "\n*******************************************\n"
-  local STAT=$(wget --no-check-certificate -qO- --timeout=3 "https://stat.cloudflare.now.cc/updateStats?script=sing-box-docker.sh")
+  local STAT=$(wget --no-check-certificate -qO- --timeout=3 "https://stat.cloudflare.now.cc/updateStats?script=nadev-box-docker.sh")
   [[ "$STAT" =~ \"todayCount\":([0-9]+),\"totalCount\":([0-9]+) ]] && local TODAY="${BASH_REMATCH[1]}" && local TOTAL="${BASH_REMATCH[2]}"
   hint "\n 脚本当天运行次数: $TODAY，累计运行次数: $TOTAL \n"
 }
@@ -1457,6 +1465,7 @@ case "$ACTION" in
     update_sing-box
     ;;
   * )
+    nadev_docker_banner
     install
     # 用 s6-overlay 作为 PID 1 承载守护
     exec /init
