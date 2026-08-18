@@ -61,7 +61,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/in
 - [8.Vmess / Vless 方案设置任意端口回源以使用 CDN](README.md#8vmess--vless-方案设置任意端口回源以使用-cdn)
 - [9.Docker 和 Docker compose 安装](README.md#9docker-和-docker-compose-安装)
 - [10.Throne 设置 shadowTLS 方法](README.md#10throne-设置-shadowtls-方法)
-- [11.主体目录文件及说明](README.md#11主体目录文件及说明)
+- [11.Nadev Box 运行目录与文件说明](README.md#11nadev-box-运行目录与文件说明)
 - [12.自签证书在不同客户端中的处理方式对比](README.md#12自签证书在不同客户端中的处理方式对比)
 - [13.鸣谢下列作者的文章和项目](README.md#13鸣谢下列作者的文章和项目)
 - [15.免责声明](README.md#15免责声明)
@@ -655,61 +655,55 @@ services:
 <img width="408" alt="image" src="https://github.com/fscarmen/sing-box/assets/62703343/753e7159-92f9-4c88-91b5-867fdc8cca47">
 
 
-## 11.主体目录文件及说明
+## 11.Nadev Box 运行目录与文件说明
+
+安装完成后，Nadev Box 的运行文件位于 `/etc/sing-box/`。日常管理请优先使用 `nb` 菜单，而不是直接修改生成的配置；这样升级、增删协议和重新导出订阅时不会遗漏关联文件。
 
 ```
-/etc/sing-box/                               # 项目主体目录
-|-- cert                                     # 存放证书文件目录
-|   |-- cert.pem                             # SSL/TLS 安全证书文件（用于大部分协议）
-|   |-- cert_200.pem                         # SSL/TLS 安全证书文件（专用于 NaiveProxy 协议）
-|   `-- private.key                          # SSL/TLS 证书的私钥信息
-|-- conf                                     # sing-box server 配置文件目录
-|   |-- 00_log.json                          # 日志配置文件
-|   |-- 01_outbounds.json                    # 服务端出站配置文件
-|   |-- 02_endpoints.json                    # 配置 endpoints，添加 warp 账户信息配置文件
-|   |-- 03_route.json                        # 路由配置文件，chatGPT 使用 warp ipv6 链式代理出站
-|   |-- 04_experimental.json                 # 缓存配置文件
-|   |-- 05_dns.json                          # DNS 规则文件
-|   |-- 06_ntp.json                          # 服务端时间同步配置文件
-|   |-- 07_http_clients.json                 # 专门给 sing-box 内部组件发 HTTP 请求配置文件
-|   |-- 08_custom_route.json                 # 用户自定义 warp-ep 出站路由规则文件，支持 domain_suffix / rule_set 分流
-|   |-- 11_xtls-reality_inbounds.json        # Reality vision 协议配置文件
-|   |-- 12_hysteria2_inbounds.json           # Hysteria2 协议配置文件
-|   |-- 13_tuic_inbounds.json                # Tuic V5 协议配置文件 # Hysteria2 协议配置文件
-|   |-- 14_ShadowTLS_inbounds.json           # ShadowTLS 协议配置文件     # Tuic V5 协议配置文件
-|   |-- 15_shadowsocks_inbounds.json         # Shadowsocks 协议配置文件
-|   |-- 16_trojan_inbounds.json              # Trojan 协议配置文件
-|   |-- 17_vmess-ws_inbounds.json            # vmess + ws 协议配置文件
-|   |-- 18_vless-ws-tls_inbounds.json        # vless + ws + tls 协议配置文件
-|   |-- 19_h2-reality_inbounds.json          # Reality http2 协议配置文件
-|   |-- 20_grpc-reality_inbounds.json        # Reality gRPC 协议配置文件
-|   |-- 21_anytls_inbounds.json              # AnyTLS 协议配置文件
-|   `-- 22_naive_inbounds.json               # NaiveProxy 协议配置文件
-|-- logs
-|   `-- box.log                              # sing-box 运行日志文件
-|-- subscribe                                # sing-box server 配置文件目录
-|   |-- qr                                   # Throne / V2rayN / Shadowrock 订阅二维码
-|   |-- shadowrocket                         # Shadowrock 订阅文件
-|   |-- proxies                              # Clash proxy provider 订阅文件
-|   |-- clash                                # Clash 订阅文件1
-|   |-- clash2                               # Clash 订阅文件2
-|   |-- sing-box-pc                          # SFM 订阅文件1
-|   |-- sing-box-phone                       # SFI / SFA 订阅文件1
-|   |-- sing-box2                            # SFI / SFA / SFM 订阅文件2
-|   |-- v2rayn                               # V2rayN 订阅文件
-|   `-- throne                               # Throne 订阅文件
-|-- cache.db                                 # sing-box 缓存文件
-|-- nginx.conf                               # 用于订阅服务的 nginx 配置文件
-|-- language                                 # 存放脚本语言文件，E 为英文，C 为中文
-|-- list                                     # 节点信息列表
-|-- sing-box                                 # sing-box 主程序
-|-- cloudflared                              # Argo tunnel 主程序
-|-- tunnel.json                              # Argo tunnel Json 信息文件
-|-- tunnel.yml                               # Argo tunnel 配置文件
-|-- sb.sh                                    # 快捷方式脚本文件
-|-- jq                                       # 命令行 json 处理器二进制文件
-`-- qrencode                                 # QR 码编码二进制文件
+/etc/sing-box/
+├── conf/              # sing-box 分片配置：基础能力、路由和各协议入站
+├── cert/              # TLS / NaiveProxy 所需的证书与私钥
+├── subscribe/         # 客户端订阅、二维码和各格式配置
+├── logs/              # 运行日志
+├── sing-box           # sing-box 主程序
+├── cloudflared        # Argo 隧道程序（安装 Argo 后存在）
+├── nginx.conf         # 订阅与 WebSocket 使用的 Nginx 配置
+├── list               # 当前节点信息与导出结果
+├── sb.sh              # Nadev Box 主脚本；`nb` 与兼容命令 `sb` 都指向它
+├── language           # 中英文菜单选择记录
+├── cache.db           # sing-box 缓存
+├── tunnel.json/yml    # Argo 固定隧道信息（仅固定隧道场景）
+├── jq                 # JSON 处理工具
+└── qrencode           # 二维码生成工具
 ```
+
+### 配置文件
+
+`conf/` 采用分片配置，Nadev Box 会按文件名顺序加载。基础文件负责日志、出站、WARP endpoint、路由、缓存、DNS、NTP 和 HTTP 客户端；`08_custom_route.json` 用于保留自定义的 WARP / domain_suffix / rule_set 路由规则。
+
+协议入站文件只会在启用对应协议后生成：
+
+| 文件 | 对应功能 |
+| --- | --- |
+| `11_xtls-reality_inbounds.json` | VLESS + Reality |
+| `12_hysteria2_inbounds.json` | Hysteria2（包括端口跳跃或 Realm 场景） |
+| `13_tuic_inbounds.json` | TUIC v5 |
+| `14_ShadowTLS_inbounds.json` | ShadowTLS |
+| `15_shadowsocks_inbounds.json` | Shadowsocks |
+| `16_trojan_inbounds.json` | Trojan |
+| `17_vmess-ws_inbounds.json` | VMess + WebSocket |
+| `18_vless-ws-tls_inbounds.json` | VLESS + WebSocket + TLS |
+| `19_h2-reality_inbounds.json` | HTTP/2 + Reality |
+| `20_grpc-reality_inbounds.json` | gRPC + Reality |
+| `21_anytls_inbounds.json` | AnyTLS |
+| `22_naive_inbounds.json` | NaiveProxy |
+
+### 订阅、备份与排障
+
+`subscribe/` 中会生成 V2rayN、Clash/Mihomo、Shadowrocket、Throne 及 sing-box 客户端文件，`qr/` 保存相应二维码。查看导出信息用 `nb -n`，修改节点名、端口、服务器地址或协议请使用 `nb -d` 和 `nb -r`。排障时先运行 `nb --doctor`，再按提示查看 `logs/box.log`。
+
+> [!WARNING]
+> 请勿公开 `cert/private.key`、`tunnel.json`、订阅链接、UUID 或 `list` 中的节点凭据。手动修改 `conf/` 前请备份整个 `/etc/sing-box/`；通过菜单改动时，脚本可能会重新生成相关入站文件。
 
 
 ## 12.自签证书在不同客户端中的处理方式对比
