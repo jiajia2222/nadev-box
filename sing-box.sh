@@ -3,6 +3,10 @@
 # 当前脚本版本号
 VERSION='v1.3.23 (2026.08.17)'
 
+# Nadev Box 是基于 fscarmen/sing-box 的 GPL-3.0-or-later 定制发行版。
+# 保留上游实现与署名；此地址用于本分支的安装、快捷命令和更新检查。
+NADEV_BOX_RAW_BASE='https://raw.githubusercontent.com/jiajia2222/nadev-box/main'
+
 # Github 反代加速代理
 GITHUB_PROXY=('https://hub.glowp.xyz/' 'https://proxy.vvvv.ee/')
 
@@ -180,8 +184,8 @@ E[69]="Install sba scripts (argo + sing-box) [https://github.com/fscarmen/sba]"
 C[69]="安装 sba 脚本 (argo + sing-box) [https://github.com/fscarmen/sba]"
 E[70]="Please enter the reality private key (privateKey), skip to generate randomly:"
 C[70]="请输入 reality 的密钥(privateKey)，跳过则随机生成:"
-E[71]="Create shortcut [ sb ] successfully."
-C[71]="创建快捷 [ sb ] 指令成功!"
+E[71]="Create shortcuts [ nb / sb ] successfully."
+C[71]="创建快捷 [ nb / sb ] 指令成功!"
 E[72]="Path to each client configuration file: ${WORK_DIR}/subscribe/\n The full template can be found at:\n https://github.com/chika0801/sing-box-examples/tree/main/Tun"
 C[72]="各客户端配置文件路径: ${WORK_DIR}/subscribe/\n 完整模板可参照:\n https://github.com/chika0801/sing-box-examples/tree/main/Tun"
 E[73]="Common rule_set: openai / google / youtube / netflix / telegram / tiktok / twitter / claude / gemini\n Enter name will auto-prefix geosite- and validate existence"
@@ -461,7 +465,7 @@ check_cdn() {
   local PROXY CODE PID CMD _url P1 P2 CODE_RAW CODE_REL
   local PIDS=()
   # 探测点1：raw 域（脚本及订阅模板文件下载路径）
-  local RAW_URL='https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh'
+  local RAW_URL="${NADEV_BOX_RAW_BASE}/sing-box.sh"
   # 探测点2：github releases 域（sing-box / jq / cloudflared 等二进制真实下载路径，
   # latest 指向永远有效）。修复 IPv6-only / 部分封锁场景：raw 域可达 ≠ releases 域可达，任一域失败都必须走代理
   local REL_URL='https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64'
@@ -2467,7 +2471,7 @@ check_system_info() {
 # 获取 sing-box 最新版本
 get_sing_box_version() {
   # FORCE_VERSION 用于在 sing-box 某个主程序出现 bug 时，强制为指定版本，以防止运行出错
-  local FORCE_VERSION=$(wget --no-check-certificate --tries=2 --timeout=3 -qO- ${GH_PROXY}https://raw.githubusercontent.com/fscarmen/sing-box/refs/heads/main/force_version | sed 's/^[vV]//g; s/\r//g')
+  local FORCE_VERSION=$(wget --no-check-certificate --tries=2 --timeout=3 -qO- "${GH_PROXY}${NADEV_BOX_RAW_BASE}/force_version" | sed 's/^[vV]//g; s/\r//g')
   if grep -q '.' <<< "$FORCE_VERSION"; then
     local RESULT_VERSION="$FORCE_VERSION"
   else
@@ -5869,11 +5873,12 @@ create_shortcut() {
   cat > ${WORK_DIR}/sb.sh << EOF
 #!/usr/bin/env bash
 
-bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) \$@
+bash <(wget --no-check-certificate -qO- ${NADEV_BOX_RAW_BASE}/sing-box.sh) \$@
 EOF
   chmod +x ${WORK_DIR}/sb.sh
   ln -sf ${WORK_DIR}/sb.sh /usr/bin/sb
-  [ -s /usr/bin/sb ] && info "\n $(text 71) "
+  ln -sf ${WORK_DIR}/sb.sh /usr/bin/nb
+  [ -x /usr/bin/sb ] && [ -x /usr/bin/nb ] && info "\n $(text 71) "
 }
 
 # 增加或删除协议
@@ -6426,7 +6431,9 @@ menu_setting() {
 menu() {
   clear
   echo -e "======================================================================================================================\n"
-  info " $(text 17): $VERSION\n $(text 18): $(text 1)\n $(text 19):\n\t $(text 20): $SYS\n\t $(text 21): $(uname -r)\n\t $(text 22): $SING_BOX_ARCH\n\t $(text 23): $VIRT "
+  local BRAND='Nadev Box · based on fscarmen/sing-box'
+  [ "$L" = 'C' ] && BRAND='Nadev Box · 基于 fscarmen/sing-box 定制'
+  info " $BRAND\n $(text 17): $VERSION\n $(text 18): $(text 1)\n $(text 19):\n\t $(text 20): $SYS\n\t $(text 21): $(uname -r)\n\t $(text 22): $SING_BOX_ARCH\n\t $(text 23): $VIRT "
   info "\t IPv4: $WAN4 $WARPSTATUS4 $COUNTRY4  $ASNORG4 "
   info "\t IPv6: $WAN6 $WARPSTATUS6 $COUNTRY6  $ASNORG6 "
   # 对齐显示：中文双宽字符按字符数补空格，英文按最长状态词 "Not install"(11字符) 定宽

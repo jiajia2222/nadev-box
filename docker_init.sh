@@ -27,7 +27,7 @@ esac
 # 检查 sing-box 最新版本
 check_latest_sing-box() {
   # 检查是否强制指定版本
-  local FORCE_VERSION=$(wget --no-check-certificate --tries=2 --timeout=3 -qO- https://raw.githubusercontent.com/fscarmen/sing-box/refs/heads/main/force_version | sed 's/^[vV]//g')
+  local FORCE_VERSION=$(wget --no-check-certificate --tries=2 --timeout=3 -qO- https://raw.githubusercontent.com/jiajia2222/nadev-box/main/force_version | sed 's/^[vV]//g')
 
   # 没有强制指定版本时，获取最新版本
   if grep -q '.' <<< "$FORCE_VERSION"; then

@@ -1,4 +1,10 @@
-# 【Sing-box 全家桶】
+# 【Nadev Box】
+
+> Nadev Box is a GPL-3.0-or-later modified distribution of
+> [fscarmen/sing-box](https://github.com/fscarmen/sing-box). The original
+> implementation and contributors remain credited; see [NOTICE.md](NOTICE.md).
+> This fork preserves the mature F-style terminal menu and protocol features,
+> while its installation and update paths use this repository.
 
 * * *
 
@@ -181,13 +187,15 @@
 
 * 首次运行
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh)
 ```
 
 * 再次运行
 ```
-sb
+nb
 ```
+
+`sb` remains available for compatibility.
 
   | Option 参数      | Remark 备注 |
   | --------------- | ------ |
@@ -209,17 +217,17 @@ sb
 ### 方式1. 最快的安装方式：自动补充所有参数
 #### 中文
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) -l
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) -l
 ```
 
 #### 英文
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) -k
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) -k
 ```
 
 ### 方式2. KV 配置文件，内容参照本库里的 config.conf
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) -f config.conf
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) -f config.conf
 ```
 
 ### 方式3. KV 传参，举例
@@ -229,7 +237,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-b
 <br>
 
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) \
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) \
   --LANGUAGE c \
   --CHOOSE_PROTOCOLS a \
   --START_PORT 8881 \
@@ -254,7 +262,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-b
 <br>
 
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) \
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) \
   --LANGUAGE c \
   --CHOOSE_PROTOCOLS a \
   --START_PORT 8881 \
@@ -276,7 +284,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-b
 <br>
 
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) \
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) \
   --LANGUAGE c \
   --CHOOSE_PROTOCOLS a \
   --START_PORT 8881 \
@@ -299,7 +307,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-b
 <br>
 
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) \
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) \
   --LANGUAGE c \
   --CHOOSE_PROTOCOLS a \
   --START_PORT 8881 \
@@ -321,7 +329,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-b
 <br>
 
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) \
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) \
   --LANGUAGE c \
   --CHOOSE_PROTOCOLS a \
   --START_PORT 8881 \
@@ -346,7 +354,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-b
 <br>
 
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) \
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) \
   --LANGUAGE c \
   --CHOOSE_PROTOCOLS a \
   --START_PORT 8881 \
@@ -370,7 +378,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-b
 <br>
 
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) \
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) \
   --LANGUAGE c \
   --CHOOSE_PROTOCOLS a \
   --START_PORT 8881 \
@@ -395,7 +403,7 @@ bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-b
 <br>
 
 ```
-bash <(wget -qO- https://raw.githubusercontent.com/fscarmen/sing-box/main/sing-box.sh) \
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh) \
   --LANGUAGE c \
   --CHOOSE_PROTOCOLS a \
   --START_PORT 8881 \
