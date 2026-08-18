@@ -1,0 +1,2 @@
+# Shell scripts execute on Linux hosts and must never carry Windows CRLF endings.
+*.sh text eol=lf
