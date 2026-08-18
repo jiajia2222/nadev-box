@@ -38,6 +38,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/in
 | 查看节点与订阅信息 | `nb -n` |
 | 修改已有配置 | `nb -d` |
 | 增删协议 | `nb -r` |
+| 只读环境诊断 | `nb --doctor` |
 | 卸载 | `nb -u` |
 
 > [!TIP]

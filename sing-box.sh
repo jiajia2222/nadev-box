@@ -416,6 +416,8 @@ E[185]="New WARP endpoint:\n IPv6: \${ADDRESS6}\n Private Key: \${PRIVATE_KEY}\n
 C[185]="新 WARP 端点:\n IPv6: \${ADDRESS6}\n Private Key: \${PRIVATE_KEY}\n Reserved: [\${R1}, \${R2}, \${R3}]"
 E[186]="Hysteria2 Realm and port hopping cannot be used together (choose one). Realm is for NAT VPS without public inbound access. If you enable Realm, port hopping will be skipped."
 C[186]="Hysteria2 Realm 与端口跳跃不能同时使用（二选一）。Realm 适用于没有公网入站的 NAT 机器；启用 Realm 后将跳过端口跳跃。"
+E[187]="Nadev Doctor diagnostics (nb --doctor)"
+C[187]="Nadev Doctor 一键诊断 (nb --doctor)"
 
 # 自定义字体彩色，read 函数
 warning() { echo -e "\033[31m\033[01m$*\033[0m"; }  # 红色
@@ -6352,6 +6354,82 @@ version() {
   fi
 }
 
+# Nadev 的只读诊断：不安装、不重启、不修改端口或配置。
+nadev_doctor() {
+  local INTERACTIVE="$1" GOOD=0 ALERT=0
+  local TITLE SYSTEM_LABEL SERVICE_LABEL CONFIG_LABEL IPV4_LABEL IPV6_LABEL MEMORY_LABEL DISK_LABEL SUMMARY_OK SUMMARY_WARN RETURN_HINT
+  if [ "$L" = 'C' ]; then
+    TITLE='Nadev Doctor · 只读系统诊断'
+    SYSTEM_LABEL='系统环境'; SERVICE_LABEL='Sing-box 服务'; CONFIG_LABEL='Sing-box 配置'
+    IPV4_LABEL='IPv4 网络'; IPV6_LABEL='IPv6 网络'; MEMORY_LABEL='可用内存'; DISK_LABEL='磁盘空间'
+    SUMMARY_OK='未发现需要处理的问题。'; SUMMARY_WARN='发现需要留意的项目，请按上方提示处理。'
+    RETURN_HINT='按 Enter 返回主菜单'
+  else
+    TITLE='Nadev Doctor · read-only system diagnostics'
+    SYSTEM_LABEL='System'; SERVICE_LABEL='Sing-box service'; CONFIG_LABEL='Sing-box configuration'
+    IPV4_LABEL='IPv4 network'; IPV6_LABEL='IPv6 network'; MEMORY_LABEL='Available memory'; DISK_LABEL='Disk space'
+    SUMMARY_OK='No issues requiring action were found.'; SUMMARY_WARN='Items need attention; review the report above.'
+    RETURN_HINT='Press Enter to return to the menu'
+  fi
+
+  _doctor_item() {
+    local LABEL="$1" STATE="$2" DETAIL="$3"
+    if [ "$STATE" = 'ok' ]; then
+      info " [OK]   ${LABEL}: ${DETAIL}"
+      ((GOOD++)) || true
+    else
+      warning " [WARN] ${LABEL}: ${DETAIL}"
+      ((ALERT++)) || true
+    fi
+  }
+
+  clear
+  echo -e "======================================================================================================================\n"
+  info " ${TITLE}\n"
+  _doctor_item "$SYSTEM_LABEL" ok "${SYS:-unknown} · ${SING_BOX_ARCH:-unknown} · ${VIRT:-unknown}"
+
+  if [ "${STATUS[0]}" = "$(text 28)" ]; then
+    _doctor_item "$SERVICE_LABEL" ok "${STATUS[0]}"
+  elif [ "${STATUS[0]}" = "$(text 27)" ]; then
+    _doctor_item "$SERVICE_LABEL" warn "${STATUS[0]}"
+  else
+    _doctor_item "$SERVICE_LABEL" warn "$(text 26)"
+  fi
+
+  if [ -x "${WORK_DIR}/sing-box" ] && [ -d "${WORK_DIR}/conf" ]; then
+    if "${WORK_DIR}/sing-box" check -C "${WORK_DIR}/conf" >/dev/null 2>&1; then
+      _doctor_item "$CONFIG_LABEL" ok "check passed"
+    else
+      _doctor_item "$CONFIG_LABEL" warn "check failed; run nb -d or inspect ${WORK_DIR}/logs/"
+    fi
+  else
+    _doctor_item "$CONFIG_LABEL" warn "$(text 26)"
+  fi
+
+  [ -n "${WAN4}" ] && _doctor_item "$IPV4_LABEL" ok "${WAN4} ${COUNTRY4} ${ASNORG4}" || _doctor_item "$IPV4_LABEL" warn "not detected"
+  [ -n "${WAN6}" ] && _doctor_item "$IPV6_LABEL" ok "${WAN6} ${COUNTRY6} ${ASNORG6}" || _doctor_item "$IPV6_LABEL" warn "not detected"
+
+  local MEM_AVAILABLE
+  MEM_AVAILABLE=$(awk '/MemAvailable:/{printf "%d MiB", $2/1024; exit}' /proc/meminfo 2>/dev/null)
+  [ -n "$MEM_AVAILABLE" ] && _doctor_item "$MEMORY_LABEL" ok "$MEM_AVAILABLE" || _doctor_item "$MEMORY_LABEL" warn "not detected"
+
+  local DISK_PERCENT DISK_FREE
+  DISK_PERCENT=$(df -P "${WORK_DIR%/*}" 2>/dev/null | awk 'NR==2 {gsub(/%/, "", $5); print $5}')
+  DISK_FREE=$(df -hP "${WORK_DIR%/*}" 2>/dev/null | awk 'NR==2 {print $4}')
+  if [ -n "$DISK_PERCENT" ] && [ "$DISK_PERCENT" -lt 90 ] 2>/dev/null; then
+    _doctor_item "$DISK_LABEL" ok "${DISK_PERCENT}% used, ${DISK_FREE} free"
+  else
+    _doctor_item "$DISK_LABEL" warn "${DISK_PERCENT:-unknown}% used, ${DISK_FREE:-unknown} free"
+  fi
+
+  echo -e "\n======================================================================================================================"
+  [ "$ALERT" -eq 0 ] && info " ${SUMMARY_OK} (${GOOD} checks passed) " || warning " ${SUMMARY_WARN} (${GOOD} passed / ${ALERT} warnings) "
+
+  if [ "$INTERACTIVE" = 'menu' ]; then
+    reading "\n ${RETURN_HINT} " _
+  fi
+}
+
 # 判断当前 Sing-box 的运行状态，并对应的给菜单和动作赋值
 menu_setting() {
   if [[ "${STATUS[0]}" =~ $(text 27)|$(text 28) ]]; then
@@ -6367,6 +6445,7 @@ menu_setting() {
     OPTION[10]="10.  $(text 59)"
     OPTION[11]="11.  $(text 69)"
     OPTION[12]="12.  $(text 76)"
+    OPTION[13]="13.  $(text 187)"
 
     ACTION[1]() { export_list; exit 0; }
 
@@ -6402,6 +6481,7 @@ menu_setting() {
     ACTION[10]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://raw.githubusercontent.com/fscarmen/argox/main/argox.sh) -$L; exit; }
     ACTION[11]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://raw.githubusercontent.com/fscarmen/sba/main/sba.sh) -$L; exit; }
     ACTION[12]() { bash <(wget --no-check-certificate -qO- https://tcp.hy2.sh/); exit; }
+    ACTION[13]() { nadev_doctor menu; menu; }
   else
     OPTION[1]="1.  $(text 115)"
     OPTION[2]="2.  $(text 34) + Argo + $(text 80) $(text 89)"
@@ -6412,6 +6492,7 @@ menu_setting() {
     OPTION[7]="7.  $(text 59)"
     OPTION[8]="8.  $(text 69)"
     OPTION[9]="9.  $(text 76)"
+    OPTION[10]="10.  $(text 187)"
 
     ACTION[1]() { IS_FAST_INSTALL='is_fast_install'; CHOOSE_PROTOCOLS=${CHOOSE_PROTOCOLS:-'a'}; START_PORT=${START_PORT:-"$START_PORT_DEFAULT"}; CDN=${CDN:-"${CDN_DOMAIN[0]}"}; IS_SUB='is_sub'; IS_ARGO='is_argo'; install_sing-box; export_list install; create_shortcut; exit; }
     ACTION[2]() { IS_SUB=is_sub; IS_ARGO=is_argo; install_sing-box; export_list install; create_shortcut; exit; }
@@ -6422,6 +6503,7 @@ menu_setting() {
     ACTION[7]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://raw.githubusercontent.com/fscarmen/argox/main/argox.sh) -$L; exit; }
     ACTION[8]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://raw.githubusercontent.com/fscarmen/sba/main/sba.sh) -$L; exit; }
     ACTION[9]() { bash <(wget --no-check-certificate -qO- ${GH_PROXY}https://tcp.hy2.sh/); exit; }
+    ACTION[10]() { nadev_doctor menu; menu; }
   fi
 
   [ "${#OPTION[@]}" -ge '10' ] && OPTION[0]="0 .  $(text 35)" || OPTION[0]="0.  $(text 35)"
@@ -6629,6 +6711,9 @@ for z in ${!ALL_PARAMETER[@]}; do
     -R )
       change_protocols; exit 0
       ;;
+    --DOCTOR )
+      IS_NADEV_DOCTOR=true
+      ;;
     --LANGUAGE )
       ((z++)); [[ "${ALL_PARAMETER[z]^^}" =~ ^C ]] && LANGUAGE=C || LANGUAGE=E
       ;;
@@ -6696,6 +6781,13 @@ for z in ${!ALL_PARAMETER[@]}; do
 done
 
 check_arch
+if [ "${IS_NADEV_DOCTOR}" = true ]; then
+  # Doctor 不执行 check_dependencies，确保不会因为诊断而安装软件包或改动服务。
+  check_system_ip
+  check_install
+  nadev_doctor
+  exit 0
+fi
 check_dependencies
 check_system_ip
 check_install
