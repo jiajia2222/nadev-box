@@ -1,15 +1,55 @@
 # 【Nadev Box】
 
+> 把成熟的 F 风格 sing-box 菜单，做成更适合日常 VPS 管理的 Nadev Box。
+
 > Nadev Box is a GPL-3.0-or-later modified distribution of
 > [fscarmen/sing-box](https://github.com/fscarmen/sing-box). The original
 > implementation and contributors remain credited; see [NOTICE.md](NOTICE.md).
 > This fork preserves the mature F-style terminal menu and protocol features,
 > while its installation and update paths use this repository.
 
+## 快速开始
+
+在已登录 root 的 Debian / Ubuntu / CentOS / Alpine / Armbian / Fedora / Arch VPS 上运行：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/jiajia2222/nadev-box/main/install.sh)
+```
+
+安装完成后输入 `nb` 回到主菜单；旧的 `sb` 命令仍然可用。菜单会自动识别系统、架构、虚拟化、IPv4/IPv6、地区与运营商信息，并将新节点默认命名为 **地区国旗 + 设备名称**。
+
+## Nadev Box 特色
+
+| 场景 | 可用能力 |
+| --- | --- |
+| 常规公网 VPS | XTLS Reality、Hysteria2、TUIC、Shadowsocks、Trojan 等多协议按需安装 |
+| NAT / CGNAT / 无公网入口 | Hysteria2 Realm，可选 WARP 辅助打洞 |
+| 网络优化 | Hysteria2 端口跳跃、独立端口、DDNS 服务器地址、TCP BBR 工具入口 |
+| 客户端使用 | 自动生成 V2rayN、Clash/Mihomo、Shadowrocket、Throne 与 sing-box 配置/订阅 |
+| 日常维护 | 主菜单查看运行状态；`nb -d` 修改节点名、端口、服务器地址、Reality SNI 与订阅配置 |
+
+## 命令速查
+
+| 目的 | 命令 |
+| --- | --- |
+| 打开主菜单 | `nb` |
+| 中文极速安装 | `nb -l` |
+| English quick install | `nb -k` |
+| 查看节点与订阅信息 | `nb -n` |
+| 修改已有配置 | `nb -d` |
+| 增删协议 | `nb -r` |
+| 卸载 | `nb -u` |
+
+> [!TIP]
+> 有公网入站时可优先从 Reality 或 Hysteria2 开始；住宅 NAT、CGNAT 或无法开放入站端口时，优先考虑 Hysteria2 Realm。请妥善保存导出的订阅、二维码和 UUID，不要公开分享。
+
 * * *
 
 # 目录
 
+- [快速开始](README.md#快速开始)
+- [Nadev Box 特色](README.md#nadev-box-特色)
+- [命令速查](README.md#命令速查)
 - [1.更新信息](README.md#1更新信息)
 - [2.项目特点](README.md#2项目特点)
 - [3.Sing-box for VPS 运行脚本](README.md#3sing-box-for-vps-运行脚本)
