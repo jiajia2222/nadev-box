@@ -6515,11 +6515,36 @@ menu_setting() {
   ACTION[0]() { exit; }
 }
 
-menu() {
+nadev_dashboard_header() {
+  local TAGLINE
+  if [ "$L" = 'C' ]; then
+    TAGLINE='智能 VPS 节点控制台 · 默认节点：地区国旗 + 设备名称'
+  else
+    TAGLINE='Smart VPS node console · Default node: region flag + hostname'
+  fi
+
   clear
-  echo -e "======================================================================================================================\n"
-  local BRAND='Nadev Box · based on fscarmen/sing-box'
-  [ "$L" = 'C' ] && BRAND='Nadev Box · 基于 fscarmen/sing-box 定制'
+  echo -e "\033[36m╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\033[0m"
+  echo -e "\033[36m║\033[1;97m  N A D E V   B O X   ·   S M A R T   N O D E   C O N S O L E                                                     \033[36m║\033[0m"
+  echo -e "\033[36m╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\033[0m"
+  hint "  ${TAGLINE}"
+  echo
+}
+
+nadev_dashboard_footer() {
+  local SHORTCUTS
+  if [ "$L" = 'C' ]; then
+    SHORTCUTS='Nadev 快捷操作：nb --doctor 诊断 · nb -d 修改配置 · nb -n 查看节点'
+  else
+    SHORTCUTS='Nadev shortcuts: nb --doctor · nb -d · nb -n'
+  fi
+  hint "\n ─ ${SHORTCUTS} ─\n"
+}
+
+menu() {
+  nadev_dashboard_header
+  local BRAND='Nadev UI build · fscarmen/sing-box core'
+  [ "$L" = 'C' ] && BRAND='Nadev 界面构建 · fscarmen/sing-box 核心'
   info " $BRAND\n $(text 17): $VERSION\n $(text 18): $(text 1)\n $(text 19):\n\t $(text 20): $SYS\n\t $(text 21): $(uname -r)\n\t $(text 22): $SING_BOX_ARCH\n\t $(text 23): $VIRT "
   info "\t IPv4: $WAN4 $WARPSTATUS4 $COUNTRY4  $ASNORG4 "
   info "\t IPv6: $WAN6 $WARPSTATUS6 $COUNTRY6  $ASNORG6 "
@@ -6550,6 +6575,7 @@ menu() {
   info "\t Nginx:    $(_sv "${STATUS[2]}")  ${NV}${NGINX_MEMORY_USAGE}"
   echo -e "\n======================================================================================================================\n"
   for ((b=1;b<=${#OPTION[*]};b++)); do [ "$b" = "${#OPTION[*]}" ] && hint " ${OPTION[0]} " || hint " ${OPTION[b]} "; done
+  nadev_dashboard_footer
   reading "\n $(text 24) " CHOOSE
 
   # 输入必须是数字且少于等于最大可选项
